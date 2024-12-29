@@ -20,6 +20,7 @@ git clone https://github.com/ChrisF1976/MMM-EventSearch.git
 
 not needed but doesn't hurt: 
 ```bash
+cd ~/MagicMirror/modules/MMM-EventSearch
 npm install
 ```
 
