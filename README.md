@@ -2,29 +2,20 @@
 
 Example:
 
-![Example of MMM-EventSearch](./MMM-EventSearch.jpg)
+![Example of MMM-EventSearch](./MMM-EventSearch.png)
 
-
-The MMM-ShellyStatusTable module displays the switch status and power consumption of multiple Shelly devices in a table on the MagicMirror², including a total consumption sum. It regularly updates the data via the Shelly Cloud API Gen 1 and Gen 2+. So it should be independent from the devices in your smart home.
-
-It is currently hard to say if every device is considered correctly. I have the following devices and it works:
- - Shelly Plug / PlugS
- - Shelly Plus Plug S
- - Shelly Plus 1 PM
- - Shelly PM Mini Gen 3
- - Shelly Plus 2 PM
- - Shelly Plus RGBW PM
+The MMM-EventSearch module for [MagicMirror²] fetches and displays event information using the SerpAPI to search for events based on a given query, location, and other parameters.
 
 
 ## Installation
 
 ### Install
 
-In your terminal, go to your [MagicMirror²][mm] Module folder and clone MMM-ShellyStatusTable:
+In your terminal, go to your [MagicMirror²][mm] Module folder and clone MMM-EventSearch:
 
 ```bash
 cd ~/MagicMirror/modules
-git clone https://github.com/ChrisF1976/MMM-ShellystatusTable.git
+git clone https://github.com/ChrisF1976/MMM-EventSearch.git
 ```
 
 not needed but doesn't hurt: 
@@ -35,7 +26,7 @@ npm install
 ### Update
 
 ```bash
-cd ~/MagicMirror/modules/MMM-ShellyStatusTable
+cd ~/MagicMirror/modules/MMM-EventSearch
 git pull
 ```
 
@@ -45,42 +36,35 @@ To use this module, add it to the modules array in the `config/config.js` file:
 
 ```js
 	{
-	module: "MMM-ShellyStatusTable",
-	position: "bottom_center",
+	module: "MMM-EventSearch",
+	header:"Was ist los?",
+  	position: "bottom_center",
 	disabled:false,
-	config: {
-		serverUri: "https://shelly-55-eu.shelly.cloud", // Shelly Cloud-API Server
-		authKey: "XXXXXXXXXXXXXXXXXXXXXXXXXXXX", // API-key: settings > user settings > auth. cloud Key > get key
-		shellys: [
-			{ name: "device-name", id: "1xxxxxxc89" },
-			{ name: "device-name", id: "2xxxxxxc89" },
-			{ name: "device-name", id: "3xxxxxxc89" },
-			{ name: "device-name", id: "4xxxxxxc89" },
-			{ name: "device-name", id: "5xxxxxxc89" },
-			{ name: "device-namee", id: "6xxxxxxc89" },
-			// device-name: device > settings > device info > device id
-			],
-		updateInterval: 5*1000, // update every 5 seconds - 1s may be possible, but I did't try
-		}
-	},
+ 	config: {
+		apiKey: "xxxxxxxxxxx",  // Your API Key from https://serpapi.com
+		location: "Germany",
+		query: "braunschweig veranstaltungen morgen", //query. Try a working query for you on google
+		updateInterval: 3600000,  // Update every hour (example)
+		hl: "de",
+		gl: "de",
+		moduleWidth: "400px",
+        	},
+        },
 ```
 
 ## Configuration options
 
 Option|Possible values|Default|Description
-------|------|------|-----------
-`serverUri`|`string`|none|To check your correct Server Uri see in your shelly app: "settings > user settings > auth. cloud Key > get key".
-`authKey`|`string`|none|get your auth key in the app: "settings > user settings > auth. cloud Key > get key".
-`shellys`|`array[]`|none|see config example. "device-name" can be "Batman" or "whatever". To find the device-id go to: "device > settings > device info > device id".
-`updateInterval`|`integer`|5*1000|the api says that every second is possible. Find your best value.
+------|---------------|-------|-----------
+`apiKey`|`string`|none|API key for authenticating requests to the event service.
+`query`|`string`|`"Veranstaltungen Braunschweig"`|The search query for fetching events. Modify it to match the events you're looking for.
+`location`|`string`|`"Germany"`|Location to restrict the event search to.
+`updateInterval`|`integer`|`10 * 60 * 1000`|Interval (in milliseconds) for automatically refreshing the events list.
+`hl`|`string`|`"de"`|Language for search results. Set it to the desired language code (e.g., `"en"` for English).
+`gl`|`string`|`"de"`|Geolocation for search. Set it to the desired country code (e.g., `"us"` for the United States).
+`googleDomain`|`string`|`"google.de"`|The Google domain to use for event search.
+`moduleWidth`|`string`|`"400px"`|Configurable width for the module. You can adjust it to fit your layout.
 
-## CSS
-Included. Some descriptions are added. It took me a while to get a nice look. Adjust to your belongings.
-
-## Tested with:
- - Shelly Plug / PlugS
- - Shelly Plus Plug S
- - Shelly Plus 1 PM 
 
 ## Credits
 - Open AI
