@@ -45,7 +45,7 @@ To use this module, add it to the modules array in the `config/config.js` file:
 		apiKey: "xxxxxxxxxxx",  // Your API Key from https://serpapi.com
 		location: "Germany",
 		query: "braunschweig veranstaltungen morgen", //query. Try a working query for you on google
-		updateInterval: 3600000,  // Update every hour (example)
+		updateInterval: 12*60*60*1000,  // Update twice a day (example)
 		hl: "de",
 		gl: "de",
 		moduleWidth: "400px",
@@ -60,7 +60,7 @@ Option|Possible values|Default|Description
 `apiKey`|`string`|none|API key for authenticating requests to the event service. Get yours on https://serpapi.com.
 `query`|`string`|`"Veranstaltungen Braunschweig"`|The search query for fetching events. Modify it to match the events you're looking for.
 `location`|`string`|`"Germany"`|Location to restrict the event search to.
-`updateInterval`|`integer`|`10 * 60 * 1000`|Interval (in milliseconds) for automatically refreshing the events list.
+`updateInterval`|`integer`|`12*60*60*1000`|Interval (in milliseconds) for automatically refreshing the events list.
 `hl`|`string`|`"de"`|Language for search results. Set it to the desired language code (e.g., `"en"` for English).
 `gl`|`string`|`"de"`|Geolocation for search. Set it to the desired country code (e.g., `"us"` for the United States).
 `googleDomain`|`string`|`"google.de"`|The Google domain to use for event search.
