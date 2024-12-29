@@ -1,0 +1,35 @@
+.MMM-EventSearch .module {
+  display: inline-block;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.MMM-EventSearch .eventTable {
+  width: 100%;
+ /* border-collapse: separate;*/
+}
+
+.MMM-EventSearch .eventTable td {
+  padding: 5px;
+  border-bottom: 1px solid;
+  border-color:#555;
+}
+
+.MMM-EventSearch .eventDate {
+  width: 15%;
+  font-size: 14px;
+  color: #555;
+}
+
+.MMM-EventSearch .eventTitle {
+  width: 55%;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.MMM-EventSearch .eventImage {
+  max-width: 80px;
+  border-radius: 5px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Deep shadow */
+}
