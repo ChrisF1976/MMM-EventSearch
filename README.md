@@ -56,7 +56,7 @@ To use this module, add it to the modules array in the `config/config.js` file:
 
 Option|Possible values|Default|Description
 ------|---------------|-------|-----------
-`apiKey`|`string`|none|API key for authenticating requests to the event service.
+`apiKey`|`string`|none|API key for authenticating requests to the event service. Get yours on https://serpapi.com.
 `query`|`string`|`"Veranstaltungen Braunschweig"`|The search query for fetching events. Modify it to match the events you're looking for.
 `location`|`string`|`"Germany"`|Location to restrict the event search to.
 `updateInterval`|`integer`|`10 * 60 * 1000`|Interval (in milliseconds) for automatically refreshing the events list.
