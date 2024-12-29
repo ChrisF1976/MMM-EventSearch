@@ -3,7 +3,7 @@ Module.register("MMM-EventSearch", {
     apiKey: "",
     query: "Veranstaltungen Braunschweig",
     location: "Germany",
-    updateInterval: 10 * 60 * 1000, // 10 minutes
+    updateInterval: 12*60*60*1000, // every 12 hours
     hl: "de",
     gl: "de",
     googleDomain: "google.de",
