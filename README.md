@@ -6,6 +6,8 @@ Example:
 
 The MMM-EventSearch module for [MagicMirror²] fetches and displays event information using the SerpAPI to search for events based on a given query, location, and other parameters.
 
+To find a suitable query go to goolge and try a little for your city or surrounding city/provice/state.
+
 
 ## Installation
 
