@@ -14,7 +14,7 @@ module.exports = NodeHelper.create({
   },
 
   async fetchEvents(config) {
-    const apiUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(
+    const apiUrl = `https://serpapi.com/search.json?engine=google_events&q=${encodeURIComponent(
       config.query
     )}&location=${encodeURIComponent(config.location || "Germany")}&hl=${config.hl || "en"}&gl=${config.gl || "uk"}&google_domain=${config.googleDomain || "google.co.uk"}&api_key=${config.apiKey}`;
 
