@@ -6,6 +6,7 @@ Module.register("MMM-EventSearch", {
     updateInterval: 12*60*60*1000, // every 12 hours
     hl: "de",
     gl: "de",
+    maxResults: 5, //maximum number of shown results
     googleDomain: "google.de",
     moduleWidth: "400px", // Add configurable width
   },
@@ -37,8 +38,11 @@ Module.register("MMM-EventSearch", {
 
     const table = document.createElement("table");
     table.className = "eventTable";
+    
+    // Apply maxResults limit here
+    const eventsToShow = this.events.slice(0, this.config.maxResults);
 
-    this.events.forEach((event) => {
+    eventsToShow.forEach((event) => {
       const row1 = document.createElement("tr");
  
       // Date column
