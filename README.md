@@ -51,6 +51,8 @@ To use this module, add it to the modules array in the `config/config.js` file:
 		hl: "de",
 		gl: "de",
 		moduleWidth: "400px",
+    		maxResults: 5, //maximum number of shown results
+    		googleDomain: "google.de",
         	},
         },
 ```
@@ -67,6 +69,7 @@ Option|Possible values|Default|Description
 `gl`|`string`|`"de"`|Geolocation for search. Set it to the desired country code (e.g., `"us"` for the United States).
 `googleDomain`|`string`|`"google.de"`|The Google domain to use for event search.
 `moduleWidth`|`string`|`"400px"`|Configurable width for the module. You can adjust it to fit your layout.
+`maxResults`|`integer`|`5`|Maximum number of shown search results.
 
 
 ## Credits
