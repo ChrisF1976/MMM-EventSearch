@@ -52,6 +52,8 @@ To use this module, add it to the modules array in the `config/config.js` file:
 		gl: "de",
 		moduleWidth: "400px",
     		maxResults: 5, //maximum number of shown results
+		rotateMoreEvents: true, // new option to enable rotation
+    		rotateInterval: 60*1000, // new option for rotation interval (1 minute)
     		googleDomain: "google.de",
         	},
         },
@@ -70,6 +72,8 @@ Option|Possible values|Default|Description
 `googleDomain`|`string`|`"google.de"`|The Google domain to use for event search.
 `moduleWidth`|`string`|`"400px"`|Configurable width for the module. You can adjust it to fit your layout.
 `maxResults`|`integer`|`5`|Maximum number of shown search results.
+`rotateMoreEvents`|`boolean`|`true`|New option to enable rotation if more events are found than shown.
+`rotateInterval`|`integer`|`60*1000`|New option for rotation interval (1 minute).
 
 
 ## Credits
