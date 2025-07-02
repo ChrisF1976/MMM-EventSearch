@@ -160,6 +160,6 @@ module.exports = NodeHelper.create({
       }
     }
 
-    return uniqueEvents.slice(0, 10); // Return max 10 events
+    return uniqueEvents.slice(0, 25); // Return max 10 events
   }
 });
