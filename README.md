@@ -1,3 +1,7 @@
+
+# ! deprecated !
+**The Google Events API has been deprecated and no longer accepts new requests, as the Google Events page no longer returns any results. Google changed to API results. At this moment no idea how to fix this issue.**
+
 # MMM-EventSearch
 
 Example:
