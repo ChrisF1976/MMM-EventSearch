@@ -1,16 +1,22 @@
 Module.register("MMM-EventSearch", {
   defaults: {
-    apiKey: "",
-    query: "Veranstaltungen Braunschweig",
-    location: "Germany",
-    updateInterval: 12*60*60*1000, // every 12 hours
-    hl: "de",
-    gl: "de",
-    maxResults: 5, // maximum number of shown results
-    rotateMoreEvents: true, // new option to enable rotation
-    rotateInterval: 60*1000, // new option for rotation interval (1 minute)
-    googleDomain: "google.de",
-    moduleWidth: "400px",
+    query: "",
+    eventType: 0,
+    venue: "0",
+    userZip: "0",
+    locationRange: 6,
+    daysAhead: 14,
+    startDate: "",
+    endDate: "",
+    dayFlag: 0,
+    freeOnly: false,
+    updateInterval: 12 * 60 * 60 * 1000,
+    maxResults: 5,
+    maxFetchResults: 30,
+    rotateMoreEvents: true,
+    rotateInterval: 10 * 1000,
+    animationSpeed: 500,
+    moduleWidth: "400px"
   },
 
   getStyles: function () {
@@ -19,33 +25,109 @@ Module.register("MMM-EventSearch", {
 
   start: function () {
     this.events = [];
-    this.currentRotationIndex = 0; // Track current rotation position
+    this.currentRotationIndex = 0;
+    this.loaded = false;
+    this.error = null;
+    this.refreshTimer = null;
+    this.rotationTimer = null;
+
+    this.fetchEvents();
+
+    this.refreshTimer = setInterval(() => {
+      this.fetchEvents();
+    }, Math.max(
+      60 * 1000,
+      Number(this.config.updateInterval) || 12 * 60 * 60 * 1000
+    ));
+
+    this.startRotation();
+  },
+
+  suspend: function () {
+    this.stopRotation();
+  },
+
+  resume: function () {
+    this.fetchEvents();
+    this.startRotation();
+  },
+
+  stop: function () {
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+      this.refreshTimer = null;
+    }
+
+    this.stopRotation();
+  },
+
+  fetchEvents: function () {
     this.sendSocketNotification("FETCH_EVENTS", this.config);
+  },
 
-    // Refresh events periodically
-    setInterval(() => {
-      this.sendSocketNotification("FETCH_EVENTS", this.config);
-    }, this.config.updateInterval);
+  startRotation: function () {
+    this.stopRotation();
 
-    // Setup rotation if enabled
-    if (this.config.rotateMoreEvents) {
-      setInterval(() => {
-        this.rotateEvents();
-      }, this.config.rotateInterval);
+    if (this.config.rotateMoreEvents !== true) {
+      return;
+    }
+
+    const rotateInterval = Math.max(
+      1000,
+      Number(this.config.rotateInterval) || 10 * 1000
+    );
+
+    this.rotationTimer = setInterval(() => {
+      this.rotateEvents();
+    }, rotateInterval);
+  },
+
+  stopRotation: function () {
+    if (this.rotationTimer) {
+      clearInterval(this.rotationTimer);
+      this.rotationTimer = null;
     }
   },
 
-  rotateEvents: function() {
-    if (!this.events || this.events.length <= this.config.maxResults) {
-      return; // No need to rotate if we don't have enough events
+  rotateEvents: function () {
+    const maxResults = this.getMaxResults();
+
+    if (!this.events || this.events.length <= maxResults) {
+      return;
     }
-    
-    this.currentRotationIndex += this.config.maxResults;
-    // Wrap around if we've reached the end
+
+    this.currentRotationIndex += maxResults;
+
     if (this.currentRotationIndex >= this.events.length) {
       this.currentRotationIndex = 0;
     }
-    this.updateDom();
+
+    this.updateDom(Number(this.config.animationSpeed) || 0);
+  },
+
+  getMaxResults: function () {
+    return Math.max(1, Number(this.config.maxResults) || 5);
+  },
+
+  getEventsToShow: function () {
+    const maxResults = this.getMaxResults();
+
+    if (
+      this.config.rotateMoreEvents !== true ||
+      this.events.length <= maxResults
+    ) {
+      return this.events.slice(0, maxResults);
+    }
+
+    const endIndex = this.currentRotationIndex + maxResults;
+
+    if (endIndex > this.events.length) {
+      return this.events
+        .slice(this.currentRotationIndex)
+        .concat(this.events.slice(0, endIndex - this.events.length));
+    }
+
+    return this.events.slice(this.currentRotationIndex, endIndex);
   },
 
   getDom: function () {
@@ -53,74 +135,114 @@ Module.register("MMM-EventSearch", {
     wrapper.style.width = this.config.moduleWidth;
     wrapper.classList.add("MMM-EventSearch");
 
+    if (!this.loaded) {
+      wrapper.innerText = "Veranstaltungen werden geladen ...";
+      return wrapper;
+    }
+
+    if (this.error) {
+      wrapper.innerText = `Fehler beim Laden der Veranstaltungen: ${this.error}`;
+      return wrapper;
+    }
+
     if (!this.events || this.events.length === 0) {
-      wrapper.innerHTML = "No events found.";
+      wrapper.innerText = "Keine Veranstaltungen gefunden.";
       return wrapper;
     }
 
     const table = document.createElement("table");
     table.className = "eventTable";
 
-    // Get the current slice of events to show
-    let eventsToShow = [];
-    if (this.config.rotateMoreEvents && this.events.length > this.config.maxResults) {
-      // Handle wrapping around the array
-      const endIndex = this.currentRotationIndex + this.config.maxResults;
-      if (endIndex > this.events.length) {
-        eventsToShow = this.events.slice(this.currentRotationIndex)
-          .concat(this.events.slice(0, endIndex % this.events.length));
-      } else {
-        eventsToShow = this.events.slice(this.currentRotationIndex, endIndex);
-      }
-    } else {
-      // Normal case - just show first maxResults events
-      eventsToShow = this.events.slice(0, this.config.maxResults);
-    }
+    this.getEventsToShow().forEach((event) => {
+      const row = document.createElement("tr");
 
-    eventsToShow.forEach((event) => {
-      const row1 = document.createElement("tr");
- 
-      // Date column
-      const dateCell1 = document.createElement("td");
-      dateCell1.className = "eventDate";
-      dateCell1.innerText = event.date.when;
+      const dateCell = document.createElement("td");
+      dateCell.className = "eventDate";
+      dateCell.innerText = this.getEventDate(event);
 
-      // Title column
       const titleCell = document.createElement("td");
       titleCell.className = "eventTitle";
-      titleCell.innerText = event.title;
 
-      // Image column
-      const imageCell = document.createElement("td");
-      imageCell.rowSpan = 1;
-      const link = document.createElement("a");
-      link.href = event.link;
-      link.target = "_blank";
+      if (event.link) {
+        const titleLink = document.createElement("a");
+        titleLink.className = "eventTitleLink";
+        titleLink.href = event.link;
+        titleLink.target = "_blank";
+        titleLink.rel = "noopener noreferrer";
+        titleLink.innerText = event.title || "Unbekannte Veranstaltung";
+        titleCell.appendChild(titleLink);
+      } else {
+        titleCell.innerText = event.title || "Unbekannte Veranstaltung";
+      }
 
-      const image = document.createElement("img");
-      image.src = event.thumbnail;
-      image.alt = event.title;
-      image.className = "eventImage";
+      row.appendChild(dateCell);
+      row.appendChild(titleCell);
 
-      link.appendChild(image);
-      imageCell.appendChild(link);
+      if (event.thumbnail) {
+        const imageCell = document.createElement("td");
+        imageCell.className = "eventImageCell";
 
-      row1.appendChild(dateCell1);
-      row1.appendChild(titleCell);
-      row1.appendChild(imageCell);
+        const image = document.createElement("img");
+        image.src = event.thumbnail;
+        image.alt = event.title || "Veranstaltung";
+        image.className = "eventImage";
+        image.loading = "lazy";
+        image.onerror = function () {
+          this.style.display = "none";
+        };
 
-      table.appendChild(row1);
+        if (event.link) {
+          const imageLink = document.createElement("a");
+          imageLink.href = event.link;
+          imageLink.target = "_blank";
+          imageLink.rel = "noopener noreferrer";
+          imageLink.appendChild(image);
+          imageCell.appendChild(imageLink);
+        } else {
+          imageCell.appendChild(image);
+        }
+
+        row.appendChild(imageCell);
+      }
+
+      table.appendChild(row);
     });
 
     wrapper.appendChild(table);
     return wrapper;
   },
 
-  socketNotificationReceived: function (notification, payload) {
-    if (notification === "EVENTS_FETCHED") {
-      this.events = payload;
-      this.currentRotationIndex = 0; // Reset rotation when new events arrive
-      this.updateDom();
+  getEventDate: function (event) {
+    if (event.date && event.date.when) {
+      return event.date.when;
     }
+
+    if (event.date && event.date.start_date) {
+      return event.time
+        ? `${event.date.start_date}, ${event.time}`
+        : event.date.start_date;
+    }
+
+    return event.time || "";
   },
+
+  socketNotificationReceived: function (notification, payload) {
+    if (notification !== "EVENTS_FETCHED") {
+      return;
+    }
+
+    this.loaded = true;
+
+    if (Array.isArray(payload)) {
+      this.events = payload;
+      this.error = null;
+    } else {
+      const result = payload || {};
+      this.events = Array.isArray(result.events) ? result.events : [];
+      this.error = result.error || null;
+    }
+
+    this.currentRotationIndex = 0;
+    this.updateDom(Number(this.config.animationSpeed) || 0);
+  }
 });

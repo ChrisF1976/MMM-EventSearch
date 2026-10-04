@@ -1,0 +1,29 @@
+{
+  "name": "mmm-eventsearch",
+  "version": "2.0.0",
+  "description": "MagicMirror module displaying events from the Braunschweig regional event calendar",
+  "main": "MMM-EventSearch.js",
+  "scripts": {
+    "test": "node --check node_helper.js && node --check MMM-EventSearch.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChrisF1976/MMM-EventSearch.git"
+  },
+  "keywords": [
+    "magicmirror",
+    "magicmirror2",
+    "events",
+    "braunschweig"
+  ],
+  "author": "Chris Franz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ChrisF1976/MMM-EventSearch/issues"
+  },
+  "homepage": "https://github.com/ChrisF1976/MMM-EventSearch#readme",
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "node-fetch": "^2.7.0"
+  }
+}

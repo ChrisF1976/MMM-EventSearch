@@ -1,35 +1,66 @@
-.MMM-EventSearch .module {
+.MMM-EventSearch {
   display: inline-block;
-  justify-content: center;
-  align-items: center;
   position: relative;
+  width: 100%;
 }
 
 .MMM-EventSearch .eventTable {
   width: 100%;
- /* border-collapse: separate;*/
+  border-collapse: collapse;
+  table-layout: auto;
 }
 
 .MMM-EventSearch .eventTable td {
   padding: 5px;
-  border-bottom: 1px solid;
-  border-color:#555;
+  border-bottom: 1px solid #555;
+  vertical-align: top;
 }
 
 .MMM-EventSearch .eventDate {
-  width: 15%;
-  font-size: 14px;
-  color: #555;
+  width: 30%;
+  font-size: 16px;
+  color: #fff;
+  white-space: normal;
 }
 
 .MMM-EventSearch .eventTitle {
-  width: 55%;
-  font-size: 16px;
+  width: auto;
+  font-size: 18px;
   font-weight: bold;
+  color: #fff;
+}
+
+.MMM-EventSearch .eventTitleLink,
+.MMM-EventSearch .eventTitleLink:link,
+.MMM-EventSearch .eventTitleLink:visited,
+.MMM-EventSearch .eventTitleLink:hover,
+.MMM-EventSearch .eventTitleLink:focus,
+.MMM-EventSearch .eventTitleLink:active {
+  color: #fff !important;
+}
+
+.MMM-EventSearch .eventTitleLink,
+.MMM-EventSearch .eventTitleLink:link,
+.MMM-EventSearch .eventTitleLink:visited {
+  text-decoration: none;
+}
+
+.MMM-EventSearch .eventTitleLink:hover,
+.MMM-EventSearch .eventTitleLink:focus,
+.MMM-EventSearch .eventTitleLink:active {
+  text-decoration: underline;
+}
+
+.MMM-EventSearch .eventImageCell {
+  width: 100px;
+  text-align: right;
 }
 
 .MMM-EventSearch .eventImage {
-  max-width: 80px;
+  display: block;
+  width: 100px;
+  max-width: 100px;
+  height: auto;
   border-radius: 5px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Deep shadow */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
