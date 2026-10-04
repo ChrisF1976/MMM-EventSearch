@@ -1,32 +1,23 @@
-
-# ! deprecated !
-**The Google Events API has been deprecated and no longer accepts new requests, as the Google Events page no longer returns any results. Google changed to API results. At this moment no idea how to fix this issue.**
-
 # MMM-EventSearch
-
-Example:
 
 ![Example of MMM-EventSearch](./MMM-EventSearch.png)
 
-The MMM-EventSearch module for [MagicMirror²] fetches and displays event information using the SerpAPI to search for events based on a given query, location, and other parameters.
+The MMM-EventSearch module for [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror) fetches and displays events from the regional event calendar for Braunschweig.
 
-To find a suitable query go to goolge and try a little for your city or surrounding city/provice/state.
+The module displays the event date, time, title and image. Event titles and images link to the corresponding event page.
 
+No API key is required.
 
 ## Installation
 
 ### Install
 
-In your terminal, go to your [MagicMirror²][mm] Module folder and clone MMM-EventSearch:
+In your terminal, go to the MagicMirror² module folder and clone MMM-EventSearch:
 
 ```bash
 cd ~/MagicMirror/modules
 git clone https://github.com/ChrisF1976/MMM-EventSearch.git
-```
-
-not needed but doesn't hurt: 
-```bash
-cd ~/MagicMirror/modules/MMM-EventSearch
+cd MMM-EventSearch
 npm install
 ```
 
@@ -35,53 +26,102 @@ npm install
 ```bash
 cd ~/MagicMirror/modules/MMM-EventSearch
 git pull
+npm install
+```
+
+Restart MagicMirror² afterwards, for example with PM2:
+
+```bash
+pm2 restart MagicMirror
 ```
 
 ## Using the module
 
-To use this module, add it to the modules array in the `config/config.js` file:
+Add the module to the modules array in `config/config.js`:
 
 ```js
-	{
-	module: "MMM-EventSearch",
-	header:"Was ist los?",
-  	position: "bottom_center",
-	disabled:false,
- 	config: {
-		apiKey: "xxxxxxxxxxx",  // Your API Key from https://serpapi.com
-		location: "Germany",
-		query: "braunschweig veranstaltungen morgen", //query. Try a working query for you on google
-		updateInterval: 12*60*60*1000,  // Update twice a day (example)
-		hl: "de",
-		gl: "de",
-		moduleWidth: "400px",
-    		maxResults: 5, //maximum number of shown results
-		rotateMoreEvents: true, // new option to enable rotation
-    		rotateInterval: 60*1000, // new option for rotation interval (1 minute)
-    		googleDomain: "google.de",
-        	},
-        },
+{
+  module: "MMM-EventSearch",
+  header: "Was ist los?",
+  position: "bottom_left",
+  disabled: false,
+
+  config: {
+    query: "",
+    daysAhead: 14,
+    updateInterval: 12 * 60 * 60 * 1000,
+    maxResults: 5,
+    maxFetchResults: 30,
+    rotateMoreEvents: true,
+    rotateInterval: 10 * 1000,
+    animationSpeed: 500,
+    moduleWidth: "400px",
+    freeOnly: false,
+    eventType: 0,
+    venue: "0",
+    userZip: "0",
+    locationRange: 6,
+    dayFlag: 0,
+    startDate: "",
+    endDate: ""
+  }
+},
 ```
 
 ## Configuration options
 
-Option|Possible values|Default|Description
-------|---------------|-------|-----------
-`apiKey`|`string`|none|API key for authenticating requests to the event service. Get yours on https://serpapi.com.
-`query`|`string`|`"Veranstaltungen Braunschweig"`|The search query for fetching events. Modify it to match the events you're looking for.
-`location`|`string`|`"Germany"`|Location to restrict the event search to.
-`updateInterval`|`integer`|`12*60*60*1000`|Interval (in milliseconds) for automatically refreshing the events list.
-`hl`|`string`|`"de"`|Language for search results. Set it to the desired language code (e.g., `"en"` for English).
-`gl`|`string`|`"de"`|Geolocation for search. Set it to the desired country code (e.g., `"us"` for the United States).
-`googleDomain`|`string`|`"google.de"`|The Google domain to use for event search.
-`moduleWidth`|`string`|`"400px"`|Configurable width for the module. You can adjust it to fit your layout.
-`maxResults`|`integer`|`5`|Maximum number of shown search results.
-`rotateMoreEvents`|`boolean`|`true`|New option to enable rotation if more events are found than shown.
-`rotateInterval`|`integer`|`60*1000`|New option for rotation interval (1 minute).
+| Option | Default | Description |
+|---|---:|---|
+| `query` | `""` | Optional search term. Leave empty to show all events. |
+| `daysAhead` | `14` | Number of days to fetch, starting today. |
+| `updateInterval` | `12 * 60 * 60 * 1000` | Update interval in milliseconds. |
+| `maxResults` | `5` | Maximum number of events shown at the same time. |
+| `maxFetchResults` | `30` | Maximum number of events fetched from the calendar. |
+| `rotateMoreEvents` | `true` | Enables rotation when more events are available. |
+| `rotateInterval` | `10 * 1000` | Rotation interval in milliseconds. |
+| `animationSpeed` | `500` | DOM update animation in milliseconds. |
+| `moduleWidth` | `"400px"` | Width of the module. |
+| `freeOnly` | `false` | Show only free events. |
+| `eventType` | `0` | Event type. `0` shows all types. |
+| `venue` | `"0"` | Venue name. `"0"` shows all venues. |
+| `userZip` | `"0"` | Optional postal code for distance filtering. |
+| `locationRange` | `6` | Distance setting used by the calendar. |
+| `dayFlag` | `0` | Calendar day filter. `0` uses the configured date range. |
+| `startDate` | `""` | Optional fixed start date in `YYYY-MM-DD` format. |
+| `endDate` | `""` | Optional fixed end date in `YYYY-MM-DD` format. |
 
+## Examples
+
+Only concerts:
+
+```js
+query: "Konzert"
+```
+
+Only free events:
+
+```js
+freeOnly: true
+```
+
+Only events at a specific venue:
+
+```js
+venue: "Staatstheater Braunschweig"
+```
+
+## Test
+
+```bash
+cd ~/MagicMirror/modules/MMM-EventSearch
+npm test
+```
+
+## Notes
+
+The module reads events from the public calendar at [Braunschweig – Die Region](https://braunschweig.die-region.de/seiten/suche/). It depends on the HTML structure of that website. Changes to the website may require an update to the module.
 
 ## Credits
-- Open AI
-- my wife :-)
 
-[mm]: https://github.com/MagicMirrorOrg/MagicMirror
+- [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror)
+- Regional event calendar Braunschweig
