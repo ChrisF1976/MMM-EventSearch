@@ -1,8 +1,8 @@
-# MMM-EventSearch
+# MMM-EventSearch - regional event calendar for Braunschweig only!
 
 ![Example of MMM-EventSearch](./MMM-EventSearch.png)
 
-The MMM-EventSearch module for [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror) fetches and displays events from the regional event calendar for Braunschweig.
+The MMM-EventSearch module for [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror) fetches and displays events from the **regional event calendar for Braunschweig only!**
 
 The module displays the event date, time, title and image. Event titles and images link to the corresponding event page.
 
