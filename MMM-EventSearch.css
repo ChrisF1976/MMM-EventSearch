@@ -51,6 +51,14 @@
   text-decoration: underline;
 }
 
+.MMM-EventSearch .eventVenue {
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.25;
+  color: #ccc;
+}
+
 .MMM-EventSearch .eventImageCell {
   width: 100px;
   text-align: right;
