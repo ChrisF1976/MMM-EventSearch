@@ -32,14 +32,10 @@ Module.register("MMM-EventSearch", {
     this.rotationTimer = null;
 
     this.fetchEvents();
-
-    this.refreshTimer = setInterval(() => {
-      this.fetchEvents();
-    }, Math.max(
+    this.refreshTimer = setInterval(() => this.fetchEvents(), Math.max(
       60 * 1000,
       Number(this.config.updateInterval) || 12 * 60 * 60 * 1000
     ));
-
     this.startRotation();
   },
 
@@ -57,7 +53,6 @@ Module.register("MMM-EventSearch", {
       clearInterval(this.refreshTimer);
       this.refreshTimer = null;
     }
-
     this.stopRotation();
   },
 
@@ -67,19 +62,10 @@ Module.register("MMM-EventSearch", {
 
   startRotation: function () {
     this.stopRotation();
+    if (this.config.rotateMoreEvents !== true) return;
 
-    if (this.config.rotateMoreEvents !== true) {
-      return;
-    }
-
-    const rotateInterval = Math.max(
-      1000,
-      Number(this.config.rotateInterval) || 10 * 1000
-    );
-
-    this.rotationTimer = setInterval(() => {
-      this.rotateEvents();
-    }, rotateInterval);
+    const interval = Math.max(1000, Number(this.config.rotateInterval) || 10000);
+    this.rotationTimer = setInterval(() => this.rotateEvents(), interval);
   },
 
   stopRotation: function () {
@@ -91,17 +77,12 @@ Module.register("MMM-EventSearch", {
 
   rotateEvents: function () {
     const maxResults = this.getMaxResults();
-
-    if (!this.events || this.events.length <= maxResults) {
-      return;
-    }
+    if (!this.events || this.events.length <= maxResults) return;
 
     this.currentRotationIndex += maxResults;
-
     if (this.currentRotationIndex >= this.events.length) {
       this.currentRotationIndex = 0;
     }
-
     this.updateDom(Number(this.config.animationSpeed) || 0);
   },
 
@@ -111,22 +92,15 @@ Module.register("MMM-EventSearch", {
 
   getEventsToShow: function () {
     const maxResults = this.getMaxResults();
-
-    if (
-      this.config.rotateMoreEvents !== true ||
-      this.events.length <= maxResults
-    ) {
+    if (this.config.rotateMoreEvents !== true || this.events.length <= maxResults) {
       return this.events.slice(0, maxResults);
     }
 
     const endIndex = this.currentRotationIndex + maxResults;
-
     if (endIndex > this.events.length) {
-      return this.events
-        .slice(this.currentRotationIndex)
+      return this.events.slice(this.currentRotationIndex)
         .concat(this.events.slice(0, endIndex - this.events.length));
     }
-
     return this.events.slice(this.currentRotationIndex, endIndex);
   },
 
@@ -139,12 +113,10 @@ Module.register("MMM-EventSearch", {
       wrapper.innerText = "Veranstaltungen werden geladen ...";
       return wrapper;
     }
-
     if (this.error) {
       wrapper.innerText = `Fehler beim Laden der Veranstaltungen: ${this.error}`;
       return wrapper;
     }
-
     if (!this.events || this.events.length === 0) {
       wrapper.innerText = "Keine Veranstaltungen gefunden.";
       return wrapper;
@@ -172,7 +144,20 @@ Module.register("MMM-EventSearch", {
         titleLink.innerText = event.title || "Unbekannte Veranstaltung";
         titleCell.appendChild(titleLink);
       } else {
-        titleCell.innerText = event.title || "Unbekannte Veranstaltung";
+        const titleText = document.createElement("div");
+        titleText.className = "eventTitleText";
+        titleText.innerText = event.title || "Unbekannte Veranstaltung";
+        titleCell.appendChild(titleText);
+      }
+
+      const venueText = this.getVenueName(
+        event.venue || event.address || ""
+      );
+      if (venueText) {
+        const venueElement = document.createElement("div");
+        venueElement.className = "eventVenue";
+        venueElement.innerText = venueText;
+        titleCell.appendChild(venueElement);
       }
 
       row.appendChild(dateCell);
@@ -187,9 +172,7 @@ Module.register("MMM-EventSearch", {
         image.alt = event.title || "Veranstaltung";
         image.className = "eventImage";
         image.loading = "lazy";
-        image.onerror = function () {
-          this.style.display = "none";
-        };
+        image.onerror = function () { this.style.display = "none"; };
 
         if (event.link) {
           const imageLink = document.createElement("a");
@@ -201,7 +184,6 @@ Module.register("MMM-EventSearch", {
         } else {
           imageCell.appendChild(image);
         }
-
         row.appendChild(imageCell);
       }
 
@@ -212,27 +194,28 @@ Module.register("MMM-EventSearch", {
     return wrapper;
   },
 
+  getVenueName: function (venue) {
+    if (!venue) {
+      return "";
+    }
+
+    return String(venue)
+      .split(",")[0]
+      .trim();
+  },
+
   getEventDate: function (event) {
-    if (event.date && event.date.when) {
-      return event.date.when;
-    }
-
+    if (event.date && event.date.when) return event.date.when;
     if (event.date && event.date.start_date) {
-      return event.time
-        ? `${event.date.start_date}, ${event.time}`
-        : event.date.start_date;
+      return event.time ? `${event.date.start_date}, ${event.time}` : event.date.start_date;
     }
-
     return event.time || "";
   },
 
   socketNotificationReceived: function (notification, payload) {
-    if (notification !== "EVENTS_FETCHED") {
-      return;
-    }
+    if (notification !== "EVENTS_FETCHED") return;
 
     this.loaded = true;
-
     if (Array.isArray(payload)) {
       this.events = payload;
       this.error = null;
@@ -241,7 +224,6 @@ Module.register("MMM-EventSearch", {
       this.events = Array.isArray(result.events) ? result.events : [];
       this.error = result.error || null;
     }
-
     this.currentRotationIndex = 0;
     this.updateDom(Number(this.config.animationSpeed) || 0);
   }
